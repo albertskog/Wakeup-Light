@@ -34,56 +34,56 @@ def __del__(self):
 
 
 mqttc = paho.Client()
-mqttc.connect("192.168.1.133")
+mqttc.connect("192.168.1.112")
 mqttc.on_message = on_message
 mqttc.on_connect = on_connect
 mqttc.on_publish = on_publish
 mqttc.on_subscribe = on_subscribe
 mqttc.loop_start()
 
-tick = 0.1
+step = 1
+tick = 1
 
-mqttc.publish("lights/r", 0)
-mqttc.publish("lights/g", 0)
-mqttc.publish("lights/b", 0)
+maxValue = 999
+red = 0
+green = 0
+blue = 0
 
-# Fade in blue
-#for i in range(0, 200):
-#    mqttc.publish("lights/b", i)
-#    sleep(tick)
+def clear():
+    mqttc.publish("lights/r", 0)
+    mqttc.publish("lights/g", 0)
+    mqttc.publish("lights/b", 0)
 
-# Add red
-#for i in range(0, 200):
-#    mqttc.publish("lights/r", i)
-#    sleep(tick)
+clear()
+state  = 1
+while (1):
+    # Red
+    if (state == 1):
+        red = red + step
+        mqttc.publish("lights/r", red)
+        # mqttc.publish("lights/g", i)
+        # mqttc.publish("lights/b", i)
+        if (red > 500): state = 2 
 
-# Add more red, remove blue
-#for i in range(200, 400):
-#    mqttc.publish("lights/r", i)
-#    mqttc.publish("lights/b", 400-i)
-#    sleep(tick)
+    # Orange -> white
+    if (state == 2):
+        red = red + step
+        green = green + step
+        mqttc.publish("lights/r", red)
+        mqttc.publish("lights/g", green)
+        # mqttc.publish("lights/b", i)
+        if (red > 800): state = 3 
 
-# Start adding green to make orange. Also start adding blue back to make white
-#for i in range(400, 800):
-    # mqttc.publish("lights/r", i)
-    # mqttc.publish("lights/g", i)
-    # mqttc.publish("lights/b", i-400)
-    # sleep(tick)
+    # Blue
+    if (state == 3):
+        red = min(red + step, maxValue)
+        green = min(green + step, maxValue)
+        blue = min(blue + step, 500)
+        mqttc.publish("lights/r", red)
+        mqttc.publish("lights/g", green)
+        mqttc.publish("lights/b", blue)
+        if (green >= maxValue): break
 
-# Go to white
-# for i in range(800, 999):
-#     mqttc.publish("lights/r", i)
-#     mqttc.publish("lights/g", i)
-#     mqttc.publish("lights/b", i-400)
-#     sleep(tick) 
+    sleep(tick)
 
-# # Add in the last blue
-# for i in range(999-400, 999):
-#     mqttc.publish("lights/b", i)
-#     sleep(tick)
-
-for i in range(0, 999, 10):
-    mqttc.publish("lights/r", i)
-    mqttc.publish("lights/g", i)
-    mqttc.publish("lights/b", i)
-    sleep(tick) 
+exit()
