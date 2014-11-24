@@ -86,4 +86,5 @@ while (1):
 
     sleep(tick)
 
+mqttc.loop_stop()
 exit()
