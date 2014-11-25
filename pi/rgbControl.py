@@ -1,5 +1,6 @@
 import paho.mqtt.client as paho
 from RPIO import PWM
+import json
 
 class Color:
 
@@ -74,7 +75,10 @@ class RGB:
     def setB(self, pulseWidth):
         self.blue.setPulseWidth(pulseWidth)
 
-
+    def setRGB(self, rgbValues):
+        self.setR(rgbValues["red"])
+        self.setG(rgbValues["green"])
+        self.setB(rgbValues["blue"])
 
 # Callbacks for MQTT events
 
@@ -85,10 +89,11 @@ def on_connect(mosq, obj, rc):
     client.subscribe("lights/#", 0)
 
 def on_message(mosq, obj, msg):
-    #lights = {'lights/r': 17, 'lights/g': 18, 'lights/b': 27, 'lights/d': '4'}
 
     print("Message received on topic "+msg.topic+" with QoS "+str(msg.qos)+" and payload "+msg.payload)
 
+    if ( str(msg.topic) == "lights/rgb" ):
+        rgb.setRGB(json.loads(msg.payload))
     
     if ( str(msg.topic) == "lights/r" ):
         rgb.setR(int(msg.payload))

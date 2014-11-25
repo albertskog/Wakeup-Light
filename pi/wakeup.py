@@ -1,6 +1,8 @@
 import paho.mqtt.client as paho
 from time import sleep
 from sys import exit
+from sys import argv
+import json
 
 # Callbacks for MQTT events
 
@@ -41,49 +43,58 @@ mqttc.on_publish = on_publish
 mqttc.on_subscribe = on_subscribe
 mqttc.loop_start()
 
+# if (len(argv) == 2):
+#     step = int(argv[0])
+#     tick = float(argv[1])
+# else:
+#     step = 1
+#     tick = 1
+
 step = 1
 tick = 1
 
 maxValue = 999
-red = 0
-green = 0
-blue = 0
+color = { "red": 0, "green": 0, "blue": 0 }
+
+def updateColor():
+    mqttc.publish("lights/rgb", json.dumps(color))
 
 def clear():
-    mqttc.publish("lights/r", 0)
-    mqttc.publish("lights/g", 0)
-    mqttc.publish("lights/b", 0)
+    color["red"]    = 0
+    color["green"]  = 0
+    color["blue"]   = 0
+    updateColor();
+
+
 
 clear()
 state  = 1
 while (1):
     # Red
     if (state == 1):
-        red = red + step
-        mqttc.publish("lights/r", red)
-        # mqttc.publish("lights/g", i)
-        # mqttc.publish("lights/b", i)
-        if (red > 500): state = 2 
+
+        color["red"] = color["red"] + step
+        
+        if (color["red"] > 500): state = 2 
 
     # Orange -> white
     if (state == 2):
-        red = red + step
-        green = green + step
-        mqttc.publish("lights/r", red)
-        mqttc.publish("lights/g", green)
-        # mqttc.publish("lights/b", i)
-        if (red > 800): state = 3 
+
+        color["red"] = color["red"] + step
+        color["green"] = color["green"] + step
+
+        if (color["red"] > 800): state = 3 
 
     # Blue
     if (state == 3):
-        red = min(red + step, maxValue)
-        green = min(green + step, maxValue)
-        blue = min(blue + step, 500)
-        mqttc.publish("lights/r", red)
-        mqttc.publish("lights/g", green)
-        mqttc.publish("lights/b", blue)
-        if (green >= maxValue): break
 
+        color["red"] = min(color["red"] + step, maxValue)
+        color["green"] = min(color["green"] + step, maxValue)
+        color["blue"] = min(color["blue"] + step, 700)
+
+        if (color["green"] >= maxValue): break
+
+    updateColor()
     sleep(tick)
 
 mqttc.loop_stop()
