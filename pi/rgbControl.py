@@ -76,9 +76,21 @@ class RGB:
         self.blue.setPulseWidth(pulseWidth)
 
     def setRGB(self, rgbValues):
-        self.setR(rgbValues["red"])
-        self.setG(rgbValues["green"])
-        self.setB(rgbValues["blue"])
+        
+        try:
+            self.setR(int(rgbValues["red"]))
+        except:
+            pass
+        
+        try:
+            self.setG(int(rgbValues["green"]))
+        except:
+            pass
+        
+        try:
+            self.setB(int(rgbValues["blue"]))
+        except:
+            pass
 
 # Callbacks for MQTT events
 
