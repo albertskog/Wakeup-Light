@@ -24,23 +24,23 @@ def on_message(mosq, obj, msg):
     
         # Check the topic and act accordingly
 
-        if (msg.topic == "wakeup/state"):
+        if ( str(msg.topic) == "wakeup/state" ):
 
-            if (payload["state"] == "start" or payload[state] == 1):
+            if ( str(payload["state"]) == "start" or payload["state"] == 1 ):
 
                 print "start wakeup"
                 state = 1
 
-            if (payload["state"] == "stop" or payload[state] == 0):
+            elif ( payload["state"] == "stop" or payload["state"] == 0 ):
 
                 print "stop wakeup"
                 state = 4
 
-        else if (msg.topic == "wakeup/time"):
+        elif ( str(msg.topic) == "wakeup/time" ):
             
             print "Setting fade time is not yet supported"
 
-        else if (msg.topic == "wakeup/alarm"):
+        elif ( str(msg.topic) == "wakeup/alarm" ):
 
             print "Setting alarm time is not yet supported"
     
@@ -146,7 +146,8 @@ while (1):
 
     # Final state, exit
     if (state == 4):
-        break;
+        state = 0
+        #break;
 
     # 2. Then send that color...
     updateColor()
