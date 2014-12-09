@@ -9,6 +9,7 @@ def on_connect(mosq, obj, rc):
     print("rc: "+str(rc))
     # Subscribe on connect in case connection is lost!
     client.subscribe("lights/#", 0)
+    client.subscribe("wakeup/#", 0)
 
 def on_message(mosq, obj, msg):
 
