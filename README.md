@@ -57,3 +57,34 @@ A JSON object published on this topic sets the time for the wakeup sequence to s
 		"day": 	  "1, 2, 3, 4, 5",
 		"month":  "*"
 	}
+
+
+#Installing
+
+###Basics
+
+	sudo apt-get install git screen man python-pip python-dev
+
+###Mosquitto MQTT Broker
+Get the latest version from their repository
+([http://mosquitto.org/2013/01/mosquitto-debian-repository/](http://mosquitto.org/2013/01/mosquitto-debian-repository/))
+
+```
+wget http://repo.mosquitto.org/debian/mosquitto-repo.gpg.key
+sudo apt-key add mosquitto-repo.gpg.key
+cd /etc/apt/sources.list.d/
+sudo wget http://repo.mosquitto.org/debian/mosquitto-stable.list
+sudo apt-get update
+sudo apt-get install mosquitto
+```
+
+###Paho MQTT Python library
+([http://mosquitto.org/documentation/python/](http://mosquitto.org/documentation/python/))
+
+	pip install paho-mqtt
+
+
+###Raspberry GPIO
+
+	pip install RPIO
+
