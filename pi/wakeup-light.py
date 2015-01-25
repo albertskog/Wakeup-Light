@@ -46,7 +46,7 @@ def on_message(mosq, obj, msg):
                 if ( str(payload["state"]) == "start" or int(payload["state"]) == 1 ):
 
                     if ( "wakeupTimeMinutes" in payload ):
-                        rgb.fadeTickSeconds = int(payload["wakeupTimeMinutes"]) * 60 / 1100
+                        rgb.fadeTickSeconds = float(payload["wakeupTimeMinutes"]) * 60 / 1100
                         print "fadeTickSeconds: {}".format(rgb.fadeTickSeconds)
 
                     print "start wakeup"
@@ -101,7 +101,7 @@ client.on_connect = on_connect
 client.on_publish = on_publish
 client.on_subscribe = on_subscribe
 #client.username_pw_set(username="",password="")
-client.connect("192.168.1.112")
+client.connect("localhost")
 # client.loop_start()
 
 
