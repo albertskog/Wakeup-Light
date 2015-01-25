@@ -22,17 +22,20 @@ A JSON object published on this topic sets all the colors at once. The key "fade
 	}
 
 ###wakeup/state
-A JSON object published on this topic sets the current state of the wakeup light sequence. Stopping the sequence while running will keep the last light setting.
+A JSON object published on this topic sets the current state of the wakeup light sequence. Stopping the sequence while running will keep the last light setting. 
 
 States may be one of the following:
 
 - "start" or 1
 - "stop" or 0
 
+The parameter "wakeupTime" may optionally be passed to set the duration of the wakeup sequence.
+
 Syntax:
 
 	{
-		"state": "start"
+		"state": "start",
+		"wakeupTimeMinutes": 30
 	}
 
 Alternative:
@@ -45,7 +48,7 @@ Alternative:
 A JSON object published on this topic sets the time it takes to perform the fading sequence. Syntax:
 
 	{
-		"fadeTimeMinutes": 25
+		"wakeupTimeMinutes": 25
 	}
 
 ###wakeup/alarm

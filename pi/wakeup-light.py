@@ -45,8 +45,15 @@ def on_message(mosq, obj, msg):
 
                 if ( str(payload["state"]) == "start" or int(payload["state"]) == 1 ):
 
+                    if ( "wakeupTimeMinutes" in payload ):
+                        rgb.fadeTickSeconds = int(payload["wakeupTimeMinutes"]) * 60 / 1100
+                        print "fadeTickSeconds: {}".format(rgb.fadeTickSeconds)
+
                     print "start wakeup"
-                    rgb.fadeState = 1
+                    
+                    # Start fade unless it is already running
+                    if (rgb.fadeState == 0):
+                        rgb.fadeState = 1
 
                 elif ( str(payload["state"]) == "stop" or int(payload["state"]) == 0 ):
 
@@ -54,8 +61,14 @@ def on_message(mosq, obj, msg):
                     rgb.fadeState = 4
 
             elif ( str(msg.topic) == "wakeup/time" ):
+                # Fade time in seconds
+                fadeTimeSeconds = payload["fadeTimeMinutes"] * 60
+                # Total number of steps / total number of seconds = time between ticks
+                fadeTickSeconds = float(rgb.fadeSteps) / fadeTimeSeconds
+                # Save to RGB object
+                rgb.fadeTickSeconds = fadeTickSeconds
                 
-                print "Setting fade time is not yet supported"
+                print "set fadeTickSeconds: {}".format(fadeTickSeconds)
 
             elif ( str(msg.topic) == "wakeup/alarm" ):
 
@@ -92,7 +105,6 @@ client.connect("192.168.1.112")
 # client.loop_start()
 
 
-tick = 1
 lastTime = time()
 
 while(1):
@@ -100,7 +112,7 @@ while(1):
 
     # Do next fade step if needed
     if (rgb.fadeState != 0):
-        if (time() - lastTime >= tick):
+        if (time() - lastTime >= rgb.fadeTickSeconds):
             lastTime = time()
             rgb.fade()
         

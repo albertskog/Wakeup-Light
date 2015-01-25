@@ -22,10 +22,10 @@ class RGB:
     step  = 1
     # The maximum value of any color
     maxValue = 999
-    # Maximum value for blue
-    maxBlue  = 700
     # List of colors to send to the lights
     color    = { "red": 0, "green": 0, "blue": 0 }
+    # Number of steps in the fading sequence
+    fadeSteps = 1100
 
     def __init__(self):
 
@@ -35,6 +35,9 @@ class RGB:
         self.red    = Color(self.pwmChannelRed, self.gpioRed, self.startValueRed)
         self.green  = Color(self.pwmChannelGreen, self.gpioGreen, self.startValueGreen)
         self.blue   = Color(self.pwmChannelBlue, self.gpioBlue, self.startValueBlue)
+
+        # Time between each fade step
+       self.fadeTickSeconds = 1
     
     def __del__(self):
         PWM.cleanup()       
@@ -82,8 +85,9 @@ class RGB:
 
         # Orange -> white
         if (self.fadeState == 2):
-
+            # Red from 500 -> 800
             self.color["red"] = self.color["red"] + self.step
+            # Green from 0 -> 300
             self.color["green"] = self.color["green"] + self.step
 
             if (self.color["red"] > 800): self.fadeState = 3 
@@ -91,9 +95,9 @@ class RGB:
         # White
         if (self.fadeState == 3):
 
-            self.color["red"]   = min(self.color["red"] + self.step, self.maxValue)
+            self.color["red"]   = min(self.color["red"]   + self.step, self.maxValue)
             self.color["green"] = min(self.color["green"] + self.step, self.maxValue)
-            self.color["blue"]  = min(self.color["blue"] + self.step, self.maxBlue)
+            self.color["blue"]  = min(self.color["blue"]  + self.step, self.maxValue)
 
             if (self.color["green"] >= self.maxValue): self.fadeState = 4
 
