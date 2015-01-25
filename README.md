@@ -84,10 +84,10 @@ sudo apt-get install mosquitto
 ###Paho MQTT Python library
 ([http://mosquitto.org/documentation/python/](http://mosquitto.org/documentation/python/))
 
-	pip install paho-mqtt
+	sudo pip install paho-mqtt
 
 
 ###Raspberry GPIO
 
-	pip install RPIO
+	sudo pip install RPIO
 

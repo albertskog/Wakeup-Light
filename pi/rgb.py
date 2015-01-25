@@ -37,7 +37,7 @@ class RGB:
         self.blue   = Color(self.pwmChannelBlue, self.gpioBlue, self.startValueBlue)
 
         # Time between each fade step
-       self.fadeTickSeconds = 1
+        self.fadeTickSeconds = 1
     
     def __del__(self):
         PWM.cleanup()       
