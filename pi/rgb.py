@@ -32,9 +32,11 @@ class RGB:
         # Initialize DMA PWM
         PWM.setup(pulse_incr_us = 5)
         
-        self.red    = Color(self.pwmChannelRed, self.gpioRed, self.startValueRed)
+        self.color = {"red": 0, "green": 0, "blue": 0} 
+
+        self.red    = Color(self.pwmChannelRed,   self.gpioRed,   self.startValueRed)
         self.green  = Color(self.pwmChannelGreen, self.gpioGreen, self.startValueGreen)
-        self.blue   = Color(self.pwmChannelBlue, self.gpioBlue, self.startValueBlue)
+        self.blue   = Color(self.pwmChannelBlue,  self.gpioBlue,  self.startValueBlue)
 
         # Time between each fade step
         self.fadeTickSeconds = 1
@@ -76,42 +78,37 @@ class RGB:
         # 1. First get a new color depending on fadeState...
         
         #if (self.fadeState == 0): #do nothing!
+        red    = {"red": 500, "green": 0, "blue": 0}
+        orange = {"red": 800, "green": 300, "blue": 0}
+        white  = {"red": 999, "green": 999, "blue": 999}
+        fadeList = [red, orange, white]
 
-        # Red
-        if (self.fadeState == 1):
-            self.color["red"] = self.color["red"] + self.step
-            
-            if (self.color["red"] > 500): self.fadeState = 2 
+        
+        if (self.fadeState != 0):
 
-        # Orange -> white
-        if (self.fadeState == 2):
-            # Red from 500 -> 800
-            self.color["red"] = self.color["red"] + self.step
-            # Green from 0 -> 300
-            self.color["green"] = self.color["green"] + self.step
+            keepState = false
 
-            if (self.color["red"] > 800): self.fadeState = 3 
+            for color in self.color:
+                self.color[color] = min( self.color[color] + self.step, fadeList[self.fadeState][color] )
 
-        # White
-        if (self.fadeState == 3):
+                if ( (self.color[color] < fadeList[self.fadeState][color]) ):
+                    keepState = true
 
-            self.color["red"]   = min(self.color["red"]   + self.step, self.maxValue)
-            self.color["green"] = min(self.color["green"] + self.step, self.maxValue)
-            self.color["blue"]  = min(self.color["blue"]  + self.step, self.maxValue)
-
-            if (self.color["green"] >= self.maxValue): self.fadeState = 4
-
-        # 2. Then send that color...
-        self.setR(self.color["red"])
-        self.setG(self.color["green"])
-        self.setB(self.color["blue"])
+            if (keepState == false):
+                self.fadeState = self.fadeState + 1
 
 
-        # Final fadeState, clear colors and return to state 0
-        if (self.fadeState == 4):
-            self.fadeState = 0
-            # reset colors for next wakeup
-            self.clear()
+            # 2. Set the colors...
+            self.setR(self.color["red"])
+            self.setG(self.color["green"])
+            self.setB(self.color["blue"])
+
+
+            # Final fadeState, clear colors and return to state 0
+            if (self.fadeState == 4):
+                self.fadeState = 0
+                # reset colors for next wakeup
+                self.clear()
 
         
 
