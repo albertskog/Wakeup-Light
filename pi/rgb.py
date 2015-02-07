@@ -1,10 +1,6 @@
-from RPIO import PWM
-from color import Color
+from pwm import Pwm
 
 class RGB:
-    pwmChannelRed   = 11
-    pwmChannelGreen = 9
-    pwmChannelBlue  = 10
 
     gpioRed         = 17
     gpioGreen       = 22
@@ -24,23 +20,18 @@ class RGB:
     maxValue = 999
     # List of colors to send to the lights
     color    = { "red": 0, "green": 0, "blue": 0 }
-    # Number of steps in the fading sequence
-    fadeSteps = 1100
 
     def __init__(self):
 
-        # Initialize DMA PWM
-        PWM.setup(pulse_incr_us = 5)
-        
-        self.red    = Color(self.pwmChannelRed, self.gpioRed, self.startValueRed)
-        self.green  = Color(self.pwmChannelGreen, self.gpioGreen, self.startValueGreen)
-        self.blue   = Color(self.pwmChannelBlue, self.gpioBlue, self.startValueBlue)
+                
+        self.red    = Pwm(self.gpioRed)
+        self.green  = Pwm(self.gpioGreen)
+        self.blue   = Pwm(self.gpioBlue)
 
         # Time between each fade step
         self.fadeTickSeconds = 1
     
-    def __del__(self):
-        PWM.cleanup()       
+    def __del__(self):   
 
     def setR(self, pulseWidth):
         self.red.setPulseWidth(pulseWidth)
