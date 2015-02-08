@@ -88,7 +88,7 @@ class RGB:
             self.color["green"] = min(self.color["green"] + self.step, self.maxValue)
             self.color["blue"]  = min(self.color["blue"]  + self.step, self.maxValue)
 
-            if (self.color["green"] >= self.maxValue): self.fadeState = 4
+            if (self.color["blue"] >= self.maxValue): self.fadeState = 4
 
         # 2. Then send that color...
         self.setR(self.color["red"])
