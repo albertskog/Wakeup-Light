@@ -7,32 +7,32 @@ class Pwm:
 
 	initialpulsewidth = 0
 	minPulseWidth = 0
-    maxPulseWidth = 999
-
+	maxPulseWidth = 999
+	pulseStart = 0
 
 
 	def __init__(self, gpioPin):
 
 		# RPIO PWM initalization
 		if (PWM.is_setup() == False):
-	        PWM.setup(pulse_incr_us = pulseIncrementUs)
+			PWM.setup(pulse_incr_us = self.pulseIncrementUs)
 
-	    self.gpioPin    = gpioPin
-        self.dutyCycle  = self.initialpulsewidth
-        self.pwmChannel = getFreePwmChannel()
+		self.gpioPin    = gpioPin
+		self.dutyCycle  = self.initialpulsewidth
+		self.pwmChannel = self.getFreePwmChannel()
 
-        PWM.init_channel(self.pwmChannel, subcycle_time_us = self.subCycleTime)
-
-
+		PWM.init_channel(self.pwmChannel, subcycle_time_us = self.subCycleTime)
 
 
-    def getFreePwmChannel(self):
+
+
+	def getFreePwmChannel(self):
 
 		availableDmaChannels = {9, 10, 11}
 
 		try:
 			for channel in availableDmaChannels:
-				if is_channel_initialized(channel) == False:
+				if PWM.is_channel_initialized(channel) == False:
 					return channel
 
 			raise Exception("No uninitialized DMA channel available.")
@@ -44,20 +44,20 @@ class Pwm:
 
 
 
-    def __del__(self):
-        PWM.cleanup()  
+	def __del__(self):
+		PWM.cleanup()  
 
 
 
-    def setPulseWidth(self, pulseWidth):
-        # Sanity checking on the pulse
-        pulseWidth = min(max(pulseWidth, self.minPulseWidth), self.maxPulseWidth)
+	def setPulseWidth(self, pulseWidth):
+		# Sanity checking on the pulse
+		pulseWidth = min(max(pulseWidth, self.minPulseWidth), self.maxPulseWidth)
 
-        # Flip the range on the pulse width because we are working with common anode LEDs
-        #self.pulseWidth  = self.maxPulseWidth - pulseWidth
+		# Flip the range on the pulse width because we are working with common anode LEDs
+		#self.pulseWidth  = self.maxPulseWidth - pulseWidth
 
-        # Remove old pulse
-        #PWM.clear_channel_gpio(self.pwmChannel, self.gpioPin)
+		# Remove old pulse
+		#PWM.clear_channel_gpio(self.pwmChannel, self.gpioPin)
 
-        # Add new pulse
-        PWM.add_channel_pulse(self.pwmChannel, self.gpioPin, self.pulseStart, pulseWidth)
+		# Add new pulse
+		PWM.add_channel_pulse(self.pwmChannel, self.gpioPin, self.pulseStart, pulseWidth)

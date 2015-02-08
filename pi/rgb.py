@@ -30,8 +30,6 @@ class RGB:
 
         # Time between each fade step
         self.fadeTickSeconds = 1
-    
-    def __del__(self):   
 
     def setR(self, pulseWidth):
         self.red.setPulseWidth(pulseWidth)
