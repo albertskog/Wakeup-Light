@@ -2,9 +2,9 @@ from pwm import Pwm
 
 class RGB:
 
-    gpioRed         = 17
-    gpioGreen       = 22
-    gpioBlue        = 27
+    gpioRed         = 27
+    gpioGreen       = 17
+    gpioBlue        = 22
 
     startValue      = 0
     startValueRed   = startValue
