@@ -101,6 +101,7 @@ class RGB:
             self.fadeState = 0
             # reset colors for next wakeup
             self.clear()
+            print "Fade ended"
 
         
 

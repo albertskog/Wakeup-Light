@@ -1,6 +1,7 @@
 import paho.mqtt.client as paho
 import json
 from time import time
+from time import sleep
 from rgb import RGB
 
 # Callbacks for MQTT events
@@ -115,6 +116,8 @@ while(1):
         if (time() - lastTime >= rgb.fadeTickSeconds):
             lastTime = time()
             rgb.fade()
+        else:
+            sleep(0.1)
         
     
 
