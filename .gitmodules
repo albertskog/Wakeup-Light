@@ -1,0 +1,3 @@
+[submodule "pi/periodicTask"]
+	path = pi/periodicTask
+	url = https://github.com/albertskog/Periodic-Python-Scheduler.git
