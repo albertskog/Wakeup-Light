@@ -1,33 +1,37 @@
 import paho.mqtt.client as paho
 import json
-from time import time
 from time import sleep
 from rgb import RGB
+from periodicTask.PeriodicTask import PeriodicTask
+
 
 # Callbacks for MQTT events
 
 def on_connect(mosq, obj, rc):
-    #mosq.subscribe("$SYS/#", 0)
-    print("rc: "+str(rc))
+    # mosq.subscribe("$SYS/#", 0)
+    print("rc: " + str(rc))
     # Subscribe on connect in case connection is lost!
     client.subscribe("lights/#", 0)
     client.subscribe("wakeup/#", 0)
 
+
 def on_message(mosq, obj, msg):
 
-    print("Message received on topic "+msg.topic+" with QoS "+str(msg.qos)+" and payload "+msg.payload)
+    print(
+        "Message received on topic " + msg.topic + " with QoS " +
+        str(msg.qos) + " and payload " + msg.payload)
 
     # lights topic
-    if ( str(msg.topic) == "lights/rgb" ):
+    if (str(msg.topic) == "lights/rgb"):
         rgb.setRGB(json.loads(msg.payload))
-    
-    if ( str(msg.topic) == "lights/r" ):
+
+    if (str(msg.topic) == "lights/r"):
         rgb.setR(int(msg.payload))
 
-    if ( str(msg.topic) == "lights/g" ):
+    if (str(msg.topic) == "lights/g"):
         rgb.setG(int(msg.payload))
 
-    if ( str(msg.topic) == "lights/b" ):
+    if (str(msg.topic) == "lights/b"):
         rgb.setB(int(msg.payload))
 
     # wakeup topics
@@ -41,50 +45,53 @@ def on_message(mosq, obj, msg):
 
             # Check the topic and act accordingly
 
-            if ( str(msg.topic) == "wakeup/state" ):
+            if (str(msg.topic) == "wakeup/state"):
                 print "wakeup/state"
 
-                if ( str(payload["state"]) == "start" or int(payload["state"]) == 1 ):
+                if (str(payload["state"]) == "start"):
 
-                    if ( "wakeupTimeMinutes" in payload ):
-                        rgb.fadeTickSeconds = float(payload["wakeupTimeMinutes"]) * 60 / 1100
-                        print "fadeTickSeconds: {}".format(rgb.fadeTickSeconds)
+                    if ("wakeupTimeMinutes" in payload):
+                        fadeTask.periodSec = float(payload["wakeupTimeMinutes"]) * 60 / 1100
+                        print "fadeTickSeconds: {}".format(fadeTask.periodSec)
 
                     print "start wakeup"
-                    
-                    # Start fade unless it is already running
-                    if (rgb.fadeState == 0):
-                        rgb.fadeState = 1
 
-                elif ( str(payload["state"]) == "stop" or int(payload["state"]) == 0 ):
+                    # Start fade unless it is already running
+                    if (not(fadeTask.isRunning)):
+                        fadeTask.start()
+
+                elif (str(payload["state"]) == "stop"):
 
                     print "stop wakeup"
-                    rgb.fadeState = 4
+                    fadeTask.cancel()
 
-            elif ( str(msg.topic) == "wakeup/time" ):
+            elif (str(msg.topic) == "wakeup/time"):
                 # Fade time in seconds
                 fadeTimeSeconds = payload["fadeTimeMinutes"] * 60
                 # Total number of steps / total number of seconds = time between ticks
                 fadeTickSeconds = float(rgb.fadeSteps) / fadeTimeSeconds
                 # Save to RGB object
                 rgb.fadeTickSeconds = fadeTickSeconds
-                
+
                 print "set fadeTickSeconds: {}".format(fadeTickSeconds)
 
-            elif ( str(msg.topic) == "wakeup/alarm" ):
+            elif (str(msg.topic) == "wakeup/alarm"):
 
                 print "Setting alarm time is not yet supported"
-        
+
         except Exception, e:
             print "JSON error"
             print e
             pass
 
+
 def on_publish(mosq, obj, mid):
-    print("mid: "+str(mid))
+    print("mid: " + str(mid))
+
 
 def on_subscribe(mosq, obj, mid, granted_qos):
-    print("Subscribed: "+str(mid)+" "+str(granted_qos))
+    print("Subscribed: " + str(mid) + " " + str(granted_qos))
+
 
 def on_log(mosq, obj, level, string):
     print(string)
@@ -95,30 +102,18 @@ print("init")
 # Create RGB object to control the leds
 rgb = RGB()
 
+# Create a periodic task to do the fading
+fadeTask = PeriodicTask(periodSec=1, task=rgb.fade)
+
 # Setup callbacks and the connection to the broker
 client = paho.Client()
 client.on_message = on_message
 client.on_connect = on_connect
 client.on_publish = on_publish
 client.on_subscribe = on_subscribe
-#client.username_pw_set(username="",password="")
+# client.username_pw_set(username="",password="")
 client.connect("localhost")
-# client.loop_start()
-
-
-lastTime = time()
+client.loop_start()
 
 while(1):
-    client.loop()
-
-    # Do next fade step if needed
-    if (rgb.fadeState != 0):
-        if (time() - lastTime >= rgb.fadeTickSeconds):
-            lastTime = time()
-            rgb.fade()
-        else:
-            sleep(0.1)
-        
-    
-
-
+    sleep(1)
